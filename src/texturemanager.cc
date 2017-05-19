@@ -37,15 +37,13 @@ sf::Texture * TextureManager::AddTexture(const char * path)
 		return curTex;
 	}
 
-	// Load the texture, we make first the push back
-	// so the reference to the texture isnt lost
-	mTextures.push_back(TextureStorage());
-	if (!mTextures[mTextures.size() - 1].SfTexture.loadFromFile(path))
+	std::shared_ptr<TextureStorage> texSt =  std::shared_ptr<TextureStorage>( new TextureStorage);
+	if (!texSt->SfTexture.loadFromFile(path))
 	{
 		// Could not load the texture
-		mTextures.pop_back();
 		return nullptr;
 	}
-	mTextures[mTextures.size() - 1].Path = path;
-	return &mTextures[mTextures.size() - 1].SfTexture;
+	mTextures.push_back(std::move(texSt));
+	mTextures[mTextures.size() - 1]->Path = path;
+	return &mTextures[mTextures.size() - 1]->SfTexture;
 }

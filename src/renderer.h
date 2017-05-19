@@ -11,13 +11,15 @@ class Button;
 class Renderer
 {
 public:
-	Renderer();
 	~Renderer();
+	static Renderer* GetInstance();
 	bool Init(unsigned int w,unsigned int h);
 	sf::RenderWindow* GetWindow();
 	void Render(Sprite* sprite);
 	void Render(Button* button);
+	sf::VideoMode GetVideoMode() { return mVidMode; }
 private:
+	Renderer();
 	sf::RenderWindow mWindow;
 	sf::VideoMode mVidMode;
 	sf::Uint32 mWindowStile;

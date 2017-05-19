@@ -10,6 +10,12 @@ Renderer::~Renderer()
 {
 }
 
+Renderer* Renderer::GetInstance()
+{
+	static Renderer sRendererInstance;
+	return &sRendererInstance;
+}
+
 bool Renderer::Init(unsigned int w, unsigned int h)
 {
 	mVidMode.width = w;
