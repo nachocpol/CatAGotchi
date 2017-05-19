@@ -1,0 +1,7 @@
+.vs/
+build/
+vsfiles/
+*.sln
+*.db
+*.opendb
+
