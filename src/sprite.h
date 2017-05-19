@@ -10,6 +10,7 @@ class Sprite
 {
 	friend class Renderer;
 	friend class Button;
+	friend class Cat;
 public:
 	Sprite(const char* path);
 	~Sprite();
