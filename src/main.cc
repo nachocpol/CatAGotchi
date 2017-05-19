@@ -20,7 +20,7 @@ int main()
 		}
 		cat.Update(0.00001f);
 
-		r->GetWindow()->clear();
+		r->GetWindow()->clear(sf::Color::White);
 
 		cat.Render(r->GetWindow());
 

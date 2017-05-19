@@ -49,4 +49,8 @@ private:
 	const char* mStdButton = "../data/textures/btntest.png";
 	const char* mStdButtonPressed = "../data/textures/btntestpres.png";
 	std::shared_ptr<Button> mFeedBtn;
+
+	// Cat
+	const char* mCatPath = "../data/textures/cat.png";
+	std::shared_ptr<Sprite> mCat;
 };

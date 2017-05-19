@@ -36,6 +36,9 @@ Cat::Cat()
 	// Init buttons
 	mFeedBtn = std::shared_ptr<Button>(new Button(mStdButton,mStdButtonPressed));
 	mFeedBtn->SetPosition(0.0f, 512.0f);
+
+	// Init cat
+	mCat = std::shared_ptr<Sprite>(new Sprite(mCatPath));
 }
 
 Cat::~Cat()
@@ -64,6 +67,8 @@ void Cat::Update(float dt)
 
 void Cat::Render(sf::RenderWindow* renderWindow)
 {
+	auto r = Renderer::GetInstance();
+	r->Render(mCat.get());
 	RenderUi(renderWindow);
 }
 
