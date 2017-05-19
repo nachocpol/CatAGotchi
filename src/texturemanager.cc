@@ -15,13 +15,13 @@ TextureManager * TextureManager::GetInstance()
 	return &sTextureManager;
 }
 
-sf::Texture * TextureManager::GetTexture(const char * path)
+sf::Texture* TextureManager::GetTexture(const char * path)
 {
 	for each(auto ele in mTextures)
 	{
-		if (ele.Path == path)
+		if (ele->Path == path)
 		{
-			return &ele.SfTexture;
+			return &ele->SfTexture;
 		}
 	}
 	// Could not find the texture
@@ -30,12 +30,22 @@ sf::Texture * TextureManager::GetTexture(const char * path)
 
 sf::Texture * TextureManager::AddTexture(const char * path)
 {
-	TextureStorage texSt;
-	if (!texSt.SfTexture.loadFromFile(path))
+	// Check if the texture already exist
+	auto curTex = GetTexture(path);
+	if (curTex)
+	{
+		return curTex;
+	}
+
+	// Load the texture, we make first the push back
+	// so the reference to the texture isnt lost
+	mTextures.push_back(TextureStorage());
+	if (!mTextures[mTextures.size() - 1].SfTexture.loadFromFile(path))
 	{
 		// Could not load the texture
+		mTextures.pop_back();
 		return nullptr;
 	}
-	mTextures.push_back(texSt);
+	mTextures[mTextures.size() - 1].Path = path;
 	return &mTextures[mTextures.size() - 1].SfTexture;
 }

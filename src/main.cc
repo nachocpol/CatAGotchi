@@ -1,12 +1,13 @@
 #include "renderer.h"
 #include "sprite.h"
-
+#include "button.h"
 int main()
 {
 	Sprite nCat("../data/textures/nyanc.jpeg");
+	Button btn("../data/textures/btntest.png");
 
 	Renderer r;
-	r.Init(512,512);
+	r.Init(512,720);
 	while (r.GetWindow()->isOpen())
 	{
 		sf::Event event;
@@ -19,7 +20,10 @@ int main()
 		}
 
 		r.GetWindow()->clear();
+
 		r.Render(&nCat);
+		r.Render(&btn);
+
 		r.GetWindow()->display();
 	}
 }

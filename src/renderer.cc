@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "sprite.h"
+#include "button.h"
 
 Renderer::Renderer()
 {
@@ -26,4 +27,9 @@ sf::RenderWindow * Renderer::GetWindow()
 void Renderer::Render(Sprite* sprite)
 {
 	mWindow.draw(sprite->mSfSprite);
+}
+
+void Renderer::Render(Button * button)
+{
+	mWindow.draw(button->GetSprite()->mSfSprite);
 }

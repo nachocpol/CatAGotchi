@@ -5,6 +5,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "SFML/Graphics.hpp"
 
 struct TextureStorage
@@ -23,6 +24,6 @@ public:
 
 private:
 	TextureManager();
-	std::vector<TextureStorage> mTextures;
+	std::vector<std::shared_ptr<TextureStorage>> mTextures;
 };
 
