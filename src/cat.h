@@ -21,7 +21,8 @@ enum CatStates
 	kIdle,
 	kPlaying,
 	kSleeping,
-	kStats
+	kStats,
+	kFade
 };
 
 class RenderWindow;
@@ -41,17 +42,29 @@ private:
 	void UpdatePlaying(float dt);
 	void UpdateSleeping(float dt);
 	void UpdateStats(float dt);
+	void UpdateFade(float dt);
 
 	void RenderMainMenu(sf::RenderWindow* renderWindow);
 	void RenderIdle(sf::RenderWindow* renderWindow);
 	void RenderPlaying(sf::RenderWindow* renderWindow);
 	void RenderSleeping(sf::RenderWindow* renderWindow);
 	void RenderStats(sf::RenderWindow* renderWindow);
+	void RenderFade(sf::RenderWindow* renderWindow);
 
 	void Reset();
 
 	CatStats mStats;
 	CatStates mState;
+
+	// Fade
+	const char* mFadeTPath = "../data/textures/fadet.png";
+	float mFadeTime = 0.25f;
+	float mFadeCurTime = 0.0f;
+	bool mHasFadedOut = false;
+	CatStates mFadeCurState;
+	CatStates mFadeFrom;
+	CatStates mFadeTo;
+	std::shared_ptr<Sprite> mFader;
 
 	// Bg tracks
 	const char* mTrack1 = "../data/sounds/catsong_1.wav";
@@ -133,4 +146,7 @@ private:
 	// Game bg
 	const char* mBgPath = "../data/textures/gamebg.jpg";
 	std::shared_ptr<Sprite> mBackground;
+
+	// Debug
+	bool mShowDebug = false;
 };

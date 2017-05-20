@@ -12,7 +12,7 @@ Cat::Cat()
 	auto audioMan = AudioManager::GetInstance();
 	audioMan->AddTrack(mTrack1);
 	audioMan->AddTrack(mTrack2);
-	audioMan->SetVolume(5.0f);
+	audioMan->SetVolume(0.0f);
 	audioMan->PlayMusic();
 
 	// Set initial state
@@ -105,6 +105,10 @@ Cat::Cat()
 	// Title
 	mTitle = std::shared_ptr<Sprite>(new Sprite(mTitlePath));
 	mTitle->mSfSprite.setPosition(0.0f, 100.0f);
+
+	// Fader
+	mFader = std::shared_ptr<Sprite>(new Sprite(mFadeTPath));
+	mFader->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 }
 
 Cat::~Cat()
@@ -132,6 +136,8 @@ void Cat::Update(float dt)
 	case kStats:
 		UpdateStats(dt);
 		break;
+	case kFade:
+		UpdateFade(dt);
 	default:
 		break;
 	}
@@ -156,6 +162,9 @@ void Cat::Render(sf::RenderWindow* renderWindow)
 	case kStats:
 		RenderStats(renderWindow);
 		break;
+	case kFade:
+		RenderFade(renderWindow);
+		break;
 	default:
 		break;
 	}
@@ -166,13 +175,22 @@ void Cat::UpdateMainMenu(float dt)
 	if (mStartBtn->IsPressed())
 	{
 		mHasStarted = true;
-		mState = kIdle;
+		mState = kFade;
+		mFadeFrom = kMainMenu;
+		mFadeTo = kIdle;
+
 		return;
 	}
 }
 
 void Cat::UpdateIdle(float dt)
 {
+	// Check debug
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F1))
+	{
+		mShowDebug = !mShowDebug;
+	}
+
 	// Feed btn
 	if (mFeedBtn->IsPressed())
 	{
@@ -200,7 +218,9 @@ void Cat::UpdateIdle(float dt)
 	// Stats btn
 	if (mGoToStatsBtn->IsPressed())
 	{
-		mState = kStats;
+		mState = kFade;
+		mFadeFrom = kIdle;
+		mFadeTo = kStats;
 		return;
 	}
 
@@ -253,8 +273,45 @@ void Cat::UpdateStats(float dt)
 	// Back to idle
 	if (mBackToIdleStatsBtn->IsPressed())
 	{
-		mState = kIdle;
+		mState = kFade;
+		mFadeFrom = kStats;
+		mFadeTo = kIdle;
 		return;
+	}
+}
+
+void Cat::UpdateFade(float dt)
+{
+	// Is fadding out
+	if (!mHasFadedOut)
+	{
+		mFadeCurState = mFadeFrom;
+
+		mFadeCurTime += dt;
+		int curAlpha = (int)((255.0f * mFadeCurTime) / mFadeTime);
+		mFader->mSfSprite.setColor(sf::Color(255, 255, 255, curAlpha));
+		if (mFadeCurTime >= mFadeTime)
+		{
+			mHasFadedOut = true;
+			mFader->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
+			mFadeCurTime = mFadeTime;
+		}
+	}
+	// Is fadding in
+	else
+	{
+		mFadeCurState = mFadeTo;
+
+		mFadeCurTime -= dt;
+		float curAlpha = (255.0f * mFadeCurTime) / mFadeTime;
+		mFader->mSfSprite.setColor(sf::Color(255, 255, 255, (float)curAlpha));
+		if (mFadeCurTime <= 0.0f)
+		{
+			mHasFadedOut = false;
+			mFader->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
+			mState = mFadeTo;
+			return;
+		}
 	}
 }
 
@@ -304,7 +361,10 @@ void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 	}
 
 	// Debug
-	RenderStats(renderWindow);
+	if (mShowDebug)
+	{
+		RenderStats(renderWindow);
+	}
 }
 
 void Cat::RenderPlaying(sf::RenderWindow * renderWindow)
@@ -365,7 +425,32 @@ void Cat::RenderStats(sf::RenderWindow * renderWindow)
 	renderWindow->draw(mHealthText);
 
 	r->Render(mBackToIdleStatsBtn.get());
+}
 
+void Cat::RenderFade(sf::RenderWindow * renderWindow)
+{
+	switch (mFadeCurState)
+	{
+	case kMainMenu:
+		RenderMainMenu(renderWindow);
+		break;
+	case kIdle:
+		RenderIdle(renderWindow);
+		break;
+	case kPlaying:
+		RenderPlaying(renderWindow);
+		break;
+	case kSleeping:
+		RenderSleeping(renderWindow);
+		break;
+	case kStats:
+		RenderStats(renderWindow);
+		break;
+	default:
+		break;
+	}
+
+	renderWindow->draw(mFader->mSfSprite);
 }
 
 void Cat::Reset()
