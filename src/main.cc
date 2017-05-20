@@ -1,3 +1,4 @@
+#include "SFML/System.hpp"
 #include "renderer.h"
 #include "cat.h"
 
@@ -8,8 +9,12 @@ int main()
 
 	Cat cat;
 
+	sf::Clock clock;
 	while (r->GetWindow()->isOpen())
 	{
+		// Delta time
+		sf::Time elapsed = clock.restart();
+
 		sf::Event event;
 		while (r->GetWindow()->pollEvent(event))
 		{
@@ -18,7 +23,7 @@ int main()
 				r->GetWindow()->close();
 			}
 		}
-		cat.Update(0.00001f);
+		cat.Update(elapsed.asSeconds());
 
 		r->GetWindow()->clear(sf::Color::White);
 
