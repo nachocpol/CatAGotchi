@@ -11,6 +11,7 @@ Cat::Cat()
 	mState = kIdle;
 
 	// Set initial stats
+	mStats.Health = 1.0f;
 	mStats.Age = 0.0f;
 	mStats.Weight = 0.0f;
 	mStats.Hunger = 0.0f;
@@ -22,6 +23,10 @@ Cat::Cat()
 	{
 		printf("ERROR:Could not load the main font.\n");
 	}
+
+	// Window size
+	auto r = Renderer::GetInstance();
+	auto wSize = r->GetWindow()->getSize();
 
 	// Hearts
 	for (int i = 0; i < mHearts; i++)
@@ -48,8 +53,8 @@ Cat::Cat()
 		mFoodSprites.push_back(Sprite(mFodPath));
 		mFoodSprites[mFoodSprites.size() - 1].mSfSprite.setPosition
 		(
-			i * 64.0f,
-			64.0f + 5.0f
+			i * 64.0f + 256.0f,
+			5.0f
 		);
 	}
 	for (int i = 0; i < mFoods; i++)
@@ -57,21 +62,31 @@ Cat::Cat()
 		mEmpFoodSprites.push_back(Sprite(mEmpFoodPath));
 		mEmpFoodSprites[mEmpFoodSprites.size() - 1].mSfSprite.setPosition
 		(
-			i * 64.0f,
-			64.0f + 5.0f
+			i * 64.0f + 256.0f,
+			5.0f
 		);
 	}
 
 	// Init buttons
-	mFeedBtn = std::shared_ptr<Button>(new Button(mStdButton,mStdButtonPressed));
-	mFeedBtn->SetPosition(0.0f, 512.0f);
+	// menu
 	mGoToStatsBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
-	mGoToStatsBtn->SetPosition(0.0f, 620.0f);
+	mGoToStatsBtn->SetPosition(384.0f, 656.0f);
 	mBackToIdleStatsBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
-	mBackToIdleStatsBtn->SetPosition(128.0f, 620.0f);
+	mBackToIdleStatsBtn->SetPosition(128.0f, 550.0f);
+	// actions
+	mFeedBtn = std::shared_ptr<Button>(new Button(mStdButton,mStdButtonPressed));
+	mFeedBtn->SetPosition(0.0f, 656.0f);
+	mPetBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
+	mPetBtn->SetPosition(128.0f, 656.0f);
+	mCleanBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
+	mCleanBtn->SetPosition(256.0f, 656.0f);
 
 	// Init cat
 	mCat = std::shared_ptr<Sprite>(new Sprite(mCatPath));
+
+	// Poop
+	mPoopSprite = std::shared_ptr<Sprite>(new Sprite(mPoopPath));
+	mPoopSprite.get()->mSfSprite.setPosition(256.0f, 400.0f);
 }
 
 Cat::~Cat()
@@ -123,11 +138,7 @@ void Cat::Render(sf::RenderWindow* renderWindow)
 void Cat::UpdateIdle(float dt)
 {
 	// Events
-	if (mGoToStatsBtn->IsPressed())
-	{
-		mState = kStats;
-		return;
-	}
+	// Feed
 	if (mFeedBtn->IsPressed())
 	{
 		mFedCurTimer += dt;
@@ -136,9 +147,26 @@ void Cat::UpdateIdle(float dt)
 			mFedCurTimer = 0.0f;
 			// Reduce hunger
 			mStats.Hunger -= mSnackHunger;
+			mStats.Hunger = std::fmax(0.0f, mStats.Hunger);
 			// Increase weight
 			mStats.Weight += mSnackWeight;
 		}
+	}
+	// Pet
+	// Clean
+	if (mCleanBtn->IsPressed())
+	{
+		if (mHasPoop)
+		{
+			mHasPoop = false;
+			mCurPoopTimer = 0.0f;
+		}
+	}
+	// Stats
+	if (mGoToStatsBtn->IsPressed())
+	{
+		mState = kStats;
+		return;
 	}
 
 	mStats.Age += dt;
@@ -148,8 +176,15 @@ void Cat::UpdateIdle(float dt)
 	}
 
 	// Calc cur food
-	mCurFoods = (mFoods * (1.0f - mStats.Hunger));
+	mCurFoods = 1.0f + (mFoods * (1.0f - mStats.Hunger));
 	if (mCurFoods > mFoods)mCurFoods = mFoods;
+
+	// Update poop status
+	mCurPoopTimer += dt;
+	if (mCurPoopTimer >= mPoopCd)
+	{
+		mHasPoop = true;
+	}
 }
 
 void Cat::UpdatePlaying(float dt)
@@ -176,6 +211,8 @@ void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 
 	r->Render(mCat.get());
 	r->Render(mFeedBtn.get());
+	r->Render(mPetBtn.get());
+	r->Render(mCleanBtn.get());
 	r->Render(mGoToStatsBtn.get());
 
 	// Bg hearts
@@ -198,6 +235,12 @@ void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 	for (int i = 0; i<mCurFoods; i++)
 	{
 		renderWindow->draw(mFoodSprites[i].mSfSprite);
+	}
+
+	// Poop!
+	if (mHasPoop)
+	{
+		r->Render(mPoopSprite.get());
 	}
 }
 

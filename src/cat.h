@@ -7,6 +7,7 @@
 
 struct CatStats
 {
+	float Health;
 	float Hunger;
 	float Happiness;
 	float Weight;
@@ -55,10 +56,17 @@ private:
 	float mMaxAge = 1800.0f;	// 30minutes
 	float mHungerRatio = 0.01f;	// +0.01 each second
 	float mSnackWeight = 10.0f;	// + 10grames
-	float mSnackHunger = 1.0f;	// -1.0f hunger
+	float mSnackHunger = 0.25f;	// -0.25f hunger
 	float mMealWeight = 100.0f;	// + 100grames
-	float mMealHunger = 2.0f;	// - 2.0f hunger
+	float mMealHunger = 0.5f;	// - 0.5f hunger
 	
+	// Poop
+	const char* mPoopPath = "../data/textures/poop.png";
+	float mPoopCd = 10.0f;
+	float mCurPoopTimer = 0.0f;
+	bool mHasPoop = true;
+	std::shared_ptr<Sprite> mPoopSprite;
+
 	// Hearts
 	const char* mHeartPath = "../data/textures/heart.png";
 	const char* mEmptHeartPath = "../data/textures/heartempt.png";
@@ -87,6 +95,10 @@ private:
 	std::shared_ptr<Button> mGoToStatsBtn;
 	// Back to idle
 	std::shared_ptr<Button> mBackToIdleStatsBtn;
+	// Pet
+	std::shared_ptr<Button> mPetBtn;
+	// Clean
+	std::shared_ptr<Button> mCleanBtn;
 
 	// Stats text
 	sf::Text mStatsAge;
