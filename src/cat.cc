@@ -4,9 +4,17 @@
 #include "sprite.h"
 #include "button.h"
 #include "renderer.h"
+#include "audiomanager.h"
 
 Cat::Cat()
 {
+	// Initialize sounds and bg music
+	auto audioMan = AudioManager::GetInstance();
+	audioMan->AddTrack(mTrack1);
+	audioMan->AddTrack(mTrack2);
+	audioMan->SetVolume(5.0f);
+	audioMan->PlayMusic();
+
 	// Set initial state
 	mState = kMainMenu;
 
@@ -93,6 +101,10 @@ Cat::Cat()
 
 	// Main background
 	mBackground = std::shared_ptr<Sprite>(new Sprite(mBgPath));
+
+	// Title
+	mTitle = std::shared_ptr<Sprite>(new Sprite(mTitlePath));
+	mTitle->mSfSprite.setPosition(0.0f, 100.0f);
 }
 
 Cat::~Cat()
@@ -101,6 +113,8 @@ Cat::~Cat()
 
 void Cat::Update(float dt)
 {
+	AudioManager::GetInstance()->Update(dt);
+
 	switch (mState)
 	{
 	case kMainMenu:
@@ -209,7 +223,6 @@ void Cat::UpdateIdle(float dt)
 	// Get sick if poop is there for a long time
 	if (mCurPoopTimer > (mPoopStartSick + mPoopCd) && mHasPoop)
 	{
-		printf("cof cof\n");
 		mStats.Health -= mPoopRatio * dt;
 		mStats.Health = std::max(0.0f, mStats.Health);
 	}
@@ -217,6 +230,14 @@ void Cat::UpdateIdle(float dt)
 	// Update health and hearts
 	mCurHears = 1.0f + (mHearts * (mStats.Health));
 	if (mCurHears > mHearts)mCurHears = mHearts;
+
+	// Check dead
+	if (mStats.Health == 0.0f)
+	{
+		Reset();
+		mState = kMainMenu;
+		return;
+	}
 }
 
 void Cat::UpdatePlaying(float dt)
@@ -241,6 +262,7 @@ void Cat::RenderMainMenu(sf::RenderWindow * renderWindow)
 {
 	auto r = Renderer::GetInstance();
 	r->Render(mStartBtn.get());
+	r->Render(mTitle.get());
 }
 
 void Cat::RenderIdle(sf::RenderWindow * renderWindow)
@@ -280,6 +302,9 @@ void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 	{
 		r->Render(mPoopSprite.get());
 	}
+
+	// Debug
+	RenderStats(renderWindow);
 }
 
 void Cat::RenderPlaying(sf::RenderWindow * renderWindow)
@@ -341,4 +366,17 @@ void Cat::RenderStats(sf::RenderWindow * renderWindow)
 
 	r->Render(mBackToIdleStatsBtn.get());
 
+}
+
+void Cat::Reset()
+{
+	// Set initial stats
+	mStats.Health = 1.0f;
+	mStats.Age = 0.0f;
+	mStats.Weight = 0.0f;
+	mStats.Hunger = 0.0f;
+	mStats.Misses = 0.0f;
+	mStats.Happiness = 0.5f;
+
+	mCurPoopTimer = 0.0f;
 }

@@ -48,8 +48,14 @@ private:
 	void RenderSleeping(sf::RenderWindow* renderWindow);
 	void RenderStats(sf::RenderWindow* renderWindow);
 
+	void Reset();
+
 	CatStats mStats;
 	CatStates mState;
+
+	// Bg tracks
+	const char* mTrack1 = "../data/sounds/catsong_1.wav";
+	const char* mTrack2 = "../data/sounds/catsong_3.wav";
 
 	// Font
 	const char* mFontPath = "../data/fonts/arial.ttf";
@@ -67,9 +73,11 @@ private:
 	float mPoopStartSick = 10.0f; // after poopCd + sick reduce health
 	
 	// Main menu
+	const char* mTitlePath = "../data/textures/title.png";
 	const char* mStartBtnPath = "../data/textures/start.png";
 	const char* mContBtnPath = "";
 	std::shared_ptr<Button> mStartBtn;
+	std::shared_ptr<Sprite> mTitle;
 	bool mHasStarted = false;
 
 	// Poop

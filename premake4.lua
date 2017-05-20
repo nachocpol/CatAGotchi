@@ -48,9 +48,15 @@ project "CatAGotchi"
 			"opengl32",
 			"freetype",
 			"jpeg",
-			"sfml-system-s-d",
 			"winmm",
-			"gdi32"
+			"gdi32",
+			"sfml-audio-s-d",
+			"openal32",
+			"flac",
+			"vorbisenc",
+			"vorbisfile",
+			"vorbis",
+			"ogg"
 		}
 
 	configuration "Release64"
@@ -71,6 +77,13 @@ project "CatAGotchi"
 			"jpeg",
 			"sfml-system-s",
 			"winmm",
-			"gdi32"
+			"gdi32",
+			"sfml-audio-s",
+			"openal32",
+			"flac",
+			"vorbisenc",
+			"vorbisfile",
+			"vorbis",
+			"ogg"
 		}
 
