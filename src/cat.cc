@@ -8,7 +8,7 @@
 Cat::Cat()
 {
 	// Set initial state
-	mState = kIdle;
+	mState = kMainMenu;
 
 	// Set initial stats
 	mStats.Health = 1.0f;
@@ -68,6 +68,9 @@ Cat::Cat()
 	}
 
 	// Init buttons
+	// start menu
+	mStartBtn = std::shared_ptr<Button>(new Button(mStartBtnPath, mStartBtnPath));
+	mStartBtn->SetPosition(192.0f, 360.0f);
 	// menu
 	mGoToStatsBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
 	mGoToStatsBtn->SetPosition(384.0f, 656.0f);
@@ -87,6 +90,9 @@ Cat::Cat()
 	// Poop
 	mPoopSprite = std::shared_ptr<Sprite>(new Sprite(mPoopPath));
 	mPoopSprite.get()->mSfSprite.setPosition(256.0f, 400.0f);
+
+	// Main background
+	mBackground = std::shared_ptr<Sprite>(new Sprite(mBgPath));
 }
 
 Cat::~Cat()
@@ -97,6 +103,9 @@ void Cat::Update(float dt)
 {
 	switch (mState)
 	{
+	case kMainMenu:
+		UpdateMainMenu(dt);
+		break;
 	case kIdle:
 		UpdateIdle(dt);
 		break;
@@ -118,6 +127,9 @@ void Cat::Render(sf::RenderWindow* renderWindow)
 {
 	switch (mState)
 	{
+	case kMainMenu:
+		RenderMainMenu(renderWindow);
+		break;
 	case kIdle:
 		RenderIdle(renderWindow);
 		break;
@@ -135,10 +147,19 @@ void Cat::Render(sf::RenderWindow* renderWindow)
 	}
 }
 
+void Cat::UpdateMainMenu(float dt)
+{
+	if (mStartBtn->IsPressed())
+	{
+		mHasStarted = true;
+		mState = kIdle;
+		return;
+	}
+}
+
 void Cat::UpdateIdle(float dt)
 {
-	// Events
-	// Feed
+	// Feed btn
 	if (mFeedBtn->IsPressed())
 	{
 		mFedCurTimer += dt;
@@ -152,8 +173,8 @@ void Cat::UpdateIdle(float dt)
 			mStats.Weight += mSnackWeight;
 		}
 	}
-	// Pet
-	// Clean
+	// Pet btn
+	// Clean btn
 	if (mCleanBtn->IsPressed())
 	{
 		if (mHasPoop)
@@ -162,7 +183,7 @@ void Cat::UpdateIdle(float dt)
 			mCurPoopTimer = 0.0f;
 		}
 	}
-	// Stats
+	// Stats btn
 	if (mGoToStatsBtn->IsPressed())
 	{
 		mState = kStats;
@@ -185,6 +206,17 @@ void Cat::UpdateIdle(float dt)
 	{
 		mHasPoop = true;
 	}
+	// Get sick if poop is there for a long time
+	if (mCurPoopTimer > (mPoopStartSick + mPoopCd) && mHasPoop)
+	{
+		printf("cof cof\n");
+		mStats.Health -= mPoopRatio * dt;
+		mStats.Health = std::max(0.0f, mStats.Health);
+	}
+
+	// Update health and hearts
+	mCurHears = 1.0f + (mHearts * (mStats.Health));
+	if (mCurHears > mHearts)mCurHears = mHearts;
 }
 
 void Cat::UpdatePlaying(float dt)
@@ -205,11 +237,17 @@ void Cat::UpdateStats(float dt)
 	}
 }
 
+void Cat::RenderMainMenu(sf::RenderWindow * renderWindow)
+{
+	auto r = Renderer::GetInstance();
+	r->Render(mStartBtn.get());
+}
+
 void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 {
 	auto r = Renderer::GetInstance();
 
-	r->Render(mCat.get());
+	r->Render(mBackground.get());
 	r->Render(mFeedBtn.get());
 	r->Render(mPetBtn.get());
 	r->Render(mCleanBtn.get());
@@ -291,6 +329,15 @@ void Cat::RenderStats(sf::RenderWindow * renderWindow)
 	std::string hap = "Happiness:" + std::to_string(hapPer) + "%";
 	mHappinessText.setString(hap);
 	renderWindow->draw(mHappinessText);
+
+	// Health
+	mHealthText.setFont(mMainFont);
+	mHealthText.setPosition(5.0f, 256.0f);
+	mHealthText.setColor(sf::Color::Black);
+	int heaPer = (int)(mStats.Health * 100.0f);
+	std::string hea = "Health:" + std::to_string(heaPer) + "%";
+	mHealthText.setString(hea);
+	renderWindow->draw(mHealthText);
 
 	r->Render(mBackToIdleStatsBtn.get());
 

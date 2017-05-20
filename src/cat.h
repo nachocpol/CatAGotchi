@@ -17,6 +17,7 @@ struct CatStats
 
 enum CatStates
 {
+	kMainMenu,
 	kIdle,
 	kPlaying,
 	kSleeping,
@@ -35,11 +36,13 @@ public:
 	void Render(sf::RenderWindow* renderWindow);
 
 private:
+	void UpdateMainMenu(float dt);
 	void UpdateIdle(float dt);
 	void UpdatePlaying(float dt);
 	void UpdateSleeping(float dt);
 	void UpdateStats(float dt);
 
+	void RenderMainMenu(sf::RenderWindow* renderWindow);
 	void RenderIdle(sf::RenderWindow* renderWindow);
 	void RenderPlaying(sf::RenderWindow* renderWindow);
 	void RenderSleeping(sf::RenderWindow* renderWindow);
@@ -59,10 +62,18 @@ private:
 	float mSnackHunger = 0.25f;	// -0.25f hunger
 	float mMealWeight = 100.0f;	// + 100grames
 	float mMealHunger = 0.5f;	// - 0.5f hunger
+	float mPoopRatio = 0.05f;	// -0.05f each second
+	float mPoopCd = 10.0f;		// how often poop
+	float mPoopStartSick = 10.0f; // after poopCd + sick reduce health
 	
+	// Main menu
+	const char* mStartBtnPath = "../data/textures/start.png";
+	const char* mContBtnPath = "";
+	std::shared_ptr<Button> mStartBtn;
+	bool mHasStarted = false;
+
 	// Poop
 	const char* mPoopPath = "../data/textures/poop.png";
-	float mPoopCd = 10.0f;
 	float mCurPoopTimer = 0.0f;
 	bool mHasPoop = true;
 	std::shared_ptr<Sprite> mPoopSprite;
@@ -105,8 +116,13 @@ private:
 	sf::Text mStatsWeight;
 	sf::Text mHungerText;
 	sf::Text mHappinessText;
+	sf::Text mHealthText;
 
 	// Cat
 	const char* mCatPath = "../data/textures/cat.png";
 	std::shared_ptr<Sprite> mCat;
+
+	// Game bg
+	const char* mBgPath = "../data/textures/gamebg.jpg";
+	std::shared_ptr<Sprite> mBackground;
 };
