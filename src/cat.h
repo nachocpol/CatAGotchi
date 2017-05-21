@@ -131,6 +131,8 @@ private:
 	bool mBgTransition = false;
 	Sprite* mTransitionFrom;
 	Sprite* mTransitionTo;
+	float mTransitionCur = 0.0f;
+	float mTransitionCd = 0.35f;
 
 	// Poop
 	const char* mPoopPath = "../data/textures/poop.png";

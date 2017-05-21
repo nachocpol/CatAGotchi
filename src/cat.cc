@@ -133,6 +133,9 @@ Cat::Cat()
 	mMidday = std::shared_ptr<Sprite>(new Sprite(mMiddayPath));
 	mSunset = std::shared_ptr<Sprite>(new Sprite(mSunsetPath));
 	mNight = std::shared_ptr<Sprite>(new Sprite(mNightPath));
+
+	// Have to do it here ok
+	mTransitionTo = mSunrise.get();
 }
 
 Cat::~Cat()
@@ -249,6 +252,8 @@ void Cat::UpdateIdle(float dt)
 			mBgTransition = true;
 			mTransitionFrom = mNight.get();
 			mTransitionTo = mSunrise.get();
+			mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
+			mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 		}
 		mCurDayTime = kSunRise;
 	}
@@ -259,6 +264,8 @@ void Cat::UpdateIdle(float dt)
 			mBgTransition = true;
 			mTransitionFrom = mSunrise.get();
 			mTransitionTo = mMidday.get();
+			mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
+			mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 		}
 		mCurDayTime = kMidday;
 	}
@@ -269,6 +276,8 @@ void Cat::UpdateIdle(float dt)
 			mBgTransition = true;
 			mTransitionFrom = mMidday.get();
 			mTransitionTo = mSunset.get();
+			mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
+			mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 		}
 		mCurDayTime = kSunset;
 	}
@@ -279,8 +288,27 @@ void Cat::UpdateIdle(float dt)
 			mBgTransition = true;
 			mTransitionFrom = mSunset.get();
 			mTransitionTo = mNight.get();
+			mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
+			mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 		}
 		mCurDayTime = kNight;
+	}
+
+	// Update background transition
+	if (mBgTransition)
+	{
+		mTransitionCur += dt;
+		int curToAlpha = (int)((255.0f * mTransitionCur) / mTransitionCd);
+		int curFromAlpha = 255 - curToAlpha;
+		mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, curToAlpha));
+		mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, curFromAlpha));
+		if (mTransitionCur >= mTransitionCd)
+		{
+			mBgTransition = false;
+			mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
+			mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
+			mTransitionCur = 0.0f;
+		}
 	}
 
 	// Check debug
@@ -485,24 +513,36 @@ void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 {
 	auto r = Renderer::GetInstance();
 
-	switch (mCurDayTime)
+	// Render both bgs (fading)
+	if (mBgTransition)
 	{
-	case kSunRise:
-		r->Render(mSunrise.get());
-		break;
-	case kMidday:
-		r->Render(mMidday.get());
-		break;
-	case kSunset:
-		r->Render(mSunset.get());
-		break;
-	case kNight:
-		r->Render(mNight.get());
-		break;
-	default:
-		break;
+		r->Render(mTransitionFrom);
+		r->Render(mTransitionTo);
 	}
-
+	// Render target bg
+	else
+	{
+		r->Render(mTransitionTo);
+		/*
+		switch (mCurDayTime)
+		{
+		case kSunRise:
+			r->Render(mSunrise.get());
+			break;
+		case kMidday:
+			r->Render(mMidday.get());
+			break;
+		case kSunset:
+			r->Render(mSunset.get());
+			break;
+		case kNight:
+			r->Render(mNight.get());
+			break;
+		default:
+			break;
+		}
+		*/
+	}
 	//r->Render(mBackground.get());
 	r->Render(mFeedBtn.get());
 	if (mShowFeedBtns)
@@ -692,4 +732,11 @@ void Cat::Reset()
 	mCurTime = 0.0f;
 	mTimeDay = 0.0f;
 	mTotalDays = 0;
+	// The first reset hack wont work here as its
+	// not yet created!!!
+	mTransitionTo = mSunrise.get();
+	if (mSunrise.get() != nullptr)
+	{
+		mSunrise.get()->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
+	}
 }
