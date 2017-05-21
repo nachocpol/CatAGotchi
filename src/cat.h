@@ -26,6 +26,14 @@ enum CatStates
 	kDead
 };
 
+enum CurDayTime
+{
+	kSunRise,
+	kMidday,
+	kSunset,
+	kNight
+};
+
 class RenderWindow;
 class Sprite;
 class Button;
@@ -111,7 +119,15 @@ private:
 	int mTotalDays = 0;
 	// 1.0f / mTimeMod = DayDuration seconds
 	float mTimeMod = 0.1f;
-	bool mNightTime = false;
+	CurDayTime mCurDayTime;
+	const char* mSunrisePath = "../data/textures/Habitacion_amanecer.jpg";
+	const char* mMiddayPath = "../data/textures/Habitacion_dia.jpg";
+	const char* mSunsetPath = "../data/textures/Habitacion_tarde.jpg";
+	const char* mNightPath = "../data/textures/Habitacion_noche.jpg";
+	std::shared_ptr<Sprite> mSunrise;
+	std::shared_ptr<Sprite> mMidday;
+	std::shared_ptr<Sprite> mSunset;
+	std::shared_ptr<Sprite> mNight;
 
 	// Poop
 	const char* mPoopPath = "../data/textures/poop.png";

@@ -127,6 +127,12 @@ Cat::Cat()
 	// Fader
 	mFader = std::shared_ptr<Sprite>(new Sprite(mFadeTPath));
 	mFader->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
+
+	// Background sprites
+	mSunrise = std::shared_ptr<Sprite>(new Sprite(mSunrisePath));
+	mMidday = std::shared_ptr<Sprite>(new Sprite(mMiddayPath));
+	mSunset = std::shared_ptr<Sprite>(new Sprite(mSunsetPath));
+	mNight = std::shared_ptr<Sprite>(new Sprite(mNightPath));
 }
 
 Cat::~Cat()
@@ -235,13 +241,22 @@ void Cat::UpdateIdle(float dt)
 		mTimeDay = 0.0f;
 		mTotalDays++;
 	}
-	if (mTimeDay >= 0.5f && mTimeDay < 1.0f)
+	// Select day time
+	if (mTimeDay >= 0.0f && mTimeDay < 0.25f)
 	{
-		mNightTime = true;
+		mCurDayTime = kSunRise;
+	}
+	else if (mTimeDay >= 0.25f && mTimeDay < 0.50f)
+	{
+		mCurDayTime = kMidday;
+	}
+	else if (mTimeDay >= 0.5f && mTimeDay < 0.75f)
+	{
+		mCurDayTime = kSunset;
 	}
 	else
 	{
-		mNightTime = false;
+		mCurDayTime = kNight;
 	}
 
 	// Check debug
@@ -446,7 +461,24 @@ void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 {
 	auto r = Renderer::GetInstance();
 
-	r->Render(mBackground.get());
+	switch (mCurDayTime)
+	{
+	case kSunRise:
+		r->Render(mSunrise.get());
+		break;
+	case kMidday:
+		r->Render(mMidday.get());
+		break;
+	case kSunset:
+		r->Render(mSunset.get());
+		break;
+	case kNight:
+		r->Render(mNight.get());
+		break;
+	default:
+		break;
+	}
+	//r->Render(mBackground.get());
 	r->Render(mFeedBtn.get());
 	if (mShowFeedBtns)
 	{
@@ -630,4 +662,9 @@ void Cat::Reset()
 	mCurPoopTimer = 0.0f;
 
 	mShowFeedBtns = false;
+
+	mCurDayTime = kSunRise;
+	mCurTime = 0.0f;
+	mTimeDay = 0.0f;
+	mTotalDays = 0;
 }
