@@ -99,10 +99,14 @@ private:
 	// Main menu
 	const char* mTitlePath = "../data/textures/title.png";
 	const char* mStartBtnPath = "../data/textures/start.png";
+	const char* mStartBtnPresPath = "../data/textures/startpres.png";
 	const char* mContBtnPath = "";
+	const char* mMainBgPath = "../data/textures/catagotchi_background.png";
 	std::shared_ptr<Button> mStartBtn;
 	std::shared_ptr<Sprite> mTitle;
+	std::shared_ptr<Sprite> mMainBg;
 	bool mHasStarted = false;
+	sf::Text mCredits;
 
 	// Audio
 	const char* mAudioPath = "../data/textures/audio.png";
@@ -120,14 +124,14 @@ private:
 	// 1.0f / mTimeMod = DayDuration seconds
 	float mTimeMod = 0.1f;
 	CurDayTime mCurDayTime;
-	const char* mSunrisePath = "../data/textures/Habitacion_amanecer.jpg";
-	const char* mMiddayPath = "../data/textures/Habitacion_dia.jpg";
-	const char* mSunsetPath = "../data/textures/Habitacion_tarde.jpg";
-	const char* mNightPath = "../data/textures/Habitacion_noche.jpg";
-	std::shared_ptr<Sprite> mSunrise;
-	std::shared_ptr<Sprite> mMidday;
-	std::shared_ptr<Sprite> mSunset;
-	std::shared_ptr<Sprite> mNight;
+	std::vector<const char*> mSunrisePath;
+	std::vector<const char*> mMiddayPath;
+	std::vector<const char*> mSunsetPath;
+	std::vector<const char*> mNightPath;
+	std::vector<std::shared_ptr<Sprite>> mSunrise;
+	std::vector<std::shared_ptr<Sprite>> mMidday;
+	std::vector<std::shared_ptr<Sprite>> mSunset;
+	std::vector<std::shared_ptr<Sprite>> mNight;
 	bool mBgTransition = false;
 	Sprite* mTransitionFrom;
 	Sprite* mTransitionTo;
@@ -181,6 +185,8 @@ private:
 	std::shared_ptr<Button> mCleanBtn;
 
 	// Stats text
+	const char* mStatsBgPath = "../data/textures/catagotchi_background.png";
+	std::shared_ptr<Sprite> mStatsBg;
 	sf::Text mStatsTitle;
 	sf::Text mStatsAge;
 	sf::Text mStatsWeight;
@@ -188,14 +194,6 @@ private:
 	sf::Text mHappinessText;
 	sf::Text mHealthText;
 	sf::Text mTotalDaysText;
-
-	// Cat
-	const char* mCatPath = "../data/textures/cat.png";
-	std::shared_ptr<Sprite> mCat;
-
-	// Game bg
-	const char* mBgPath = "../data/textures/gamebg.jpg";
-	std::shared_ptr<Sprite> mBackground;
 
 	// Dead
 	const char* mDeadBtnPath = "../data/textures/btntest.png";

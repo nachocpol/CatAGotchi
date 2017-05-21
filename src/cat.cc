@@ -46,8 +46,13 @@ Cat::Cat()
 		mHeartsSprites.push_back(Sprite(mHeartPath));
 		mHeartsSprites[mHeartsSprites.size() - 1].mSfSprite.setPosition
 		(
-			i * 64.0f,
+			i * 32.0f + 16.0f,
 			5.0f
+		);
+		mHeartsSprites[mHeartsSprites.size() - 1].mSfSprite.setScale
+		(
+			0.5f,
+			0.5f
 		);
 	}
 	for (int i = 0; i < mHearts; i++)
@@ -55,8 +60,13 @@ Cat::Cat()
 		mEmptHeartsSprites.push_back(Sprite(mEmptHeartPath));
 		mEmptHeartsSprites[mEmptHeartsSprites.size() - 1].mSfSprite.setPosition
 		(
-			i * 64.0f,
+			i * 32.0f + 16.0f,
 			5.0f
+		);
+		mEmptHeartsSprites[mEmptHeartsSprites.size() - 1].mSfSprite.setScale
+		(
+			0.5f,
+			0.5f
 		);
 	}
 	// Foods
@@ -65,8 +75,14 @@ Cat::Cat()
 		mFoodSprites.push_back(Sprite(mFodPath));
 		mFoodSprites[mFoodSprites.size() - 1].mSfSprite.setPosition
 		(
-			i * 64.0f + 256.0f,
-			5.0f
+			// * spacing + lateral space + + moar lateral space
+			i * 32.0f + 256.0f + 16.0f + 92.0f,
+			0.0f
+		);
+		mFoodSprites[mFoodSprites.size() - 1].mSfSprite.setScale
+		(
+			0.5f,
+			0.5f
 		);
 	}
 	for (int i = 0; i < mFoods; i++)
@@ -74,15 +90,20 @@ Cat::Cat()
 		mEmpFoodSprites.push_back(Sprite(mEmpFoodPath));
 		mEmpFoodSprites[mEmpFoodSprites.size() - 1].mSfSprite.setPosition
 		(
-			i * 64.0f + 256.0f,
-			5.0f
+			i * 32.0f + 256.0f + 16.0f + 92.0f,
+			0.0f
+		);
+		mEmpFoodSprites[mEmpFoodSprites.size() - 1].mSfSprite.setScale
+		(
+			0.5f,
+			0.5f
 		);
 	}
 
 	// Init buttons
 	// start menu
-	mStartBtn = std::shared_ptr<Button>(new Button(mStartBtnPath, mStartBtnPath));
-	mStartBtn->SetPosition(192.0f, 360.0f);
+	mStartBtn = std::shared_ptr<Button>(new Button(mStartBtnPath, mStartBtnPresPath));
+	mStartBtn->SetPosition(0.0f, 360.0f);
 	// menu
 	mGoToStatsBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
 	mGoToStatsBtn->SetPosition(384.0f, 656.0f);
@@ -104,19 +125,14 @@ Cat::Cat()
 	mDeadBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
 	mDeadBtn->SetPosition(192.0f, 460.0f);
 
-	// Init cat
-	mCat = std::shared_ptr<Sprite>(new Sprite(mCatPath));
-
 	// Poop
 	mPoopSprite = std::shared_ptr<Sprite>(new Sprite(mPoopPath));
-	mPoopSprite.get()->mSfSprite.setPosition(256.0f, 400.0f);
-
-	// Main background
-	mBackground = std::shared_ptr<Sprite>(new Sprite(mBgPath));
+	mPoopSprite.get()->mSfSprite.setPosition(358.0f, 362.0f);
 
 	// Title
 	mTitle = std::shared_ptr<Sprite>(new Sprite(mTitlePath));
 	mTitle->mSfSprite.setPosition(0.0f, 100.0f);
+	mMainBg = std::shared_ptr<Sprite>(new Sprite(mMainBgPath));
 
 	// Audio
 	mAudio = std::shared_ptr<Sprite>(new Sprite(mAudioPath));
@@ -129,13 +145,59 @@ Cat::Cat()
 	mFader->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 
 	// Background sprites
-	mSunrise = std::shared_ptr<Sprite>(new Sprite(mSunrisePath));
-	mMidday = std::shared_ptr<Sprite>(new Sprite(mMiddayPath));
-	mSunset = std::shared_ptr<Sprite>(new Sprite(mSunsetPath));
-	mNight = std::shared_ptr<Sprite>(new Sprite(mNightPath));
+	// Sun rise
+	mSunrisePath = 
+	{
+		"../data/textures/roombg/Habitacion_amanecer_Momo.jpg",
+		"../data/textures/roombg/Habitacion_amanecer_Momo_cajon.jpg",
+		"../data/textures/roombg/Habitacion_amanecer_Momo_cama.jpg",
+		"../data/textures/roombg/Habitacion_amanecer_Momo_cortina.jpg"
+	};
+	for (auto i = 0; i < mSunrisePath.size(); i++)
+	{
+		mSunrise.push_back(std::shared_ptr<Sprite>(new Sprite(mSunrisePath[i])));
+	}
+	// Midday
+	mMiddayPath =
+	{
+		"../data/textures/roombg/Habitacion_dia_Momo.jpg",
+		"../data/textures/roombg/Habitacion_dia_Momo_cajon.jpg",
+		"../data/textures/roombg/Habitacion_dia_Momo_cama.jpg",
+		"../data/textures/roombg/Habitacion_dia_Momo_cortina.jpg"
+	};
+	for (auto i = 0; i < mMiddayPath.size(); i++)
+	{
+		mMidday.push_back(std::shared_ptr<Sprite>(new Sprite(mMiddayPath[i])));
+	}
+	// Sunset
+	mSunsetPath =
+	{
+		"../data/textures/roombg/Habitacion_tarde_Momo.jpg",
+		"../data/textures/roombg/Habitacion_tarde_Momo_cajon.jpg",
+		"../data/textures/roombg/Habitacion_tarde_Momo_cama.jpg",
+		"../data/textures/roombg/Habitacion_tarde_Momo_cortina.jpg"
+	};
+	for (auto i = 0; i < mSunsetPath.size(); i++)
+	{
+		mSunset.push_back(std::shared_ptr<Sprite>(new Sprite(mSunsetPath[i])));
+	}
+	// Night
+	mNightPath =
+	{
+		"../data/textures/roombg/Habitacion_noche_Momo.jpg",
+		"../data/textures/roombg/Habitacion_noche_Momo_cajon.jpg",
+		"../data/textures/roombg/Habitacion_noche_Momo_cama.jpg",
+		"../data/textures/roombg/Habitacion_noche_Momo_cortina.jpg"
+	};
+	for (auto i = 0; i < mNightPath.size(); i++)
+	{
+		mNight.push_back(std::shared_ptr<Sprite>(new Sprite(mNightPath[i])));
+	}
 
+	// Stats bg
+	mStatsBg = std::shared_ptr<Sprite>(new Sprite(mStatsBgPath));
 	// Have to do it here ok
-	mTransitionTo = mSunrise.get();
+	mTransitionTo = mSunrise[0].get();
 }
 
 Cat::~Cat()
@@ -250,8 +312,8 @@ void Cat::UpdateIdle(float dt)
 		if (mCurDayTime != kSunRise)
 		{
 			mBgTransition = true;
-			mTransitionFrom = mNight.get();
-			mTransitionTo = mSunrise.get();
+			mTransitionFrom = mTransitionTo;
+			mTransitionTo = mSunrise[std::rand() % 3].get();
 			mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
 			mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 		}
@@ -262,8 +324,8 @@ void Cat::UpdateIdle(float dt)
 		if (mCurDayTime != kMidday)
 		{
 			mBgTransition = true;
-			mTransitionFrom = mSunrise.get();
-			mTransitionTo = mMidday.get();
+			mTransitionFrom = mTransitionTo;
+			mTransitionTo = mMidday[std::rand() % 3].get();
 			mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
 			mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 		}
@@ -274,8 +336,8 @@ void Cat::UpdateIdle(float dt)
 		if (mCurDayTime != kSunset)
 		{
 			mBgTransition = true;
-			mTransitionFrom = mMidday.get();
-			mTransitionTo = mSunset.get();
+			mTransitionFrom = mTransitionTo;
+			mTransitionTo = mSunset[std::rand() % 3].get();
 			mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
 			mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 		}
@@ -286,8 +348,8 @@ void Cat::UpdateIdle(float dt)
 		if (mCurDayTime != kNight)
 		{
 			mBgTransition = true;
-			mTransitionFrom = mSunset.get();
-			mTransitionTo = mNight.get();
+			mTransitionFrom = mTransitionTo;
+			mTransitionTo = mNight[std::rand() % 3].get();
 			mTransitionFrom->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
 			mTransitionTo->mSfSprite.setColor(sf::Color(255, 255, 255, 0));
 		}
@@ -312,10 +374,12 @@ void Cat::UpdateIdle(float dt)
 	}
 
 	// Check debug
+#ifdef _DEBUG
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F1))
 	{
 		mShowDebug = !mShowDebug;
 	}
+#endif // _DEBUG
 
 	// Feed btn
 	mFedCurTimer += dt;
@@ -497,6 +561,7 @@ void Cat::UpdateDead(float dt)
 void Cat::RenderMainMenu(sf::RenderWindow * renderWindow)
 {
 	auto r = Renderer::GetInstance();
+	r->Render(mMainBg.get());
 	r->Render(mStartBtn.get());
 	r->Render(mTitle.get());
 	if (mIsMuted)
@@ -507,6 +572,14 @@ void Cat::RenderMainMenu(sf::RenderWindow * renderWindow)
 	{
 		r->Render(mAudio.get());
 	}
+
+	mCredits.setFont(mMainFont);
+	std::string cred = "       Made by:\n @andreafayosmo \n     @IamVOIID \n     @nachocpol";
+	mCredits.setString(cred);
+	mCredits.setCharacterSize(20);
+	mCredits.setPosition(168.0f, 612.0f);
+	mCredits.setColor(sf::Color::Black);
+	renderWindow->draw(mCredits);
 }
 
 void Cat::RenderIdle(sf::RenderWindow * renderWindow)
@@ -602,7 +675,8 @@ void Cat::RenderSleeping(sf::RenderWindow * renderWindow)
 void Cat::RenderStats(sf::RenderWindow * renderWindow)
 {
 	auto r = Renderer::GetInstance();
-	
+	r->Render(mStatsBg.get());
+
 	const float kTopOff = 50.0f;
 
 	//Title
@@ -732,11 +806,16 @@ void Cat::Reset()
 	mCurTime = 0.0f;
 	mTimeDay = 0.0f;
 	mTotalDays = 0;
+
 	// The first reset hack wont work here as its
 	// not yet created!!!
-	mTransitionTo = mSunrise.get();
-	if (mSunrise.get() != nullptr)
+	
+	if (mSunrise.size() > 0)
 	{
-		mSunrise.get()->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
+		mTransitionTo = mSunrise[0].get();
+		for each (auto ele in mSunrise)
+		{
+			ele.get()->mSfSprite.setColor(sf::Color(255, 255, 255, 255));
+		}
 	}
 }
