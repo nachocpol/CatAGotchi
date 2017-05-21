@@ -12,7 +12,7 @@ Cat::Cat()
 	auto audioMan = AudioManager::GetInstance();
 	audioMan->AddTrack(mTrack1);
 	audioMan->AddTrack(mTrack2);
-	audioMan->SetVolume(0.0f);
+	audioMan->SetVolume(mIsMuted == true ? 0.0f : 10.0f);
 	audioMan->PlayMusic();
 
 	// Set initial state
@@ -87,6 +87,10 @@ Cat::Cat()
 	// actions
 	mFeedBtn = std::shared_ptr<Button>(new Button(mStdButton,mStdButtonPressed));
 	mFeedBtn->SetPosition(0.0f, 656.0f);
+	mSnackBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
+	mSnackBtn->SetPosition(0.0f, 592.0f);
+	mMealBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
+	mMealBtn->SetPosition(0.0f, 528.0f);
 	mPetBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
 	mPetBtn->SetPosition(128.0f, 656.0f);
 	mCleanBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
@@ -105,6 +109,12 @@ Cat::Cat()
 	// Title
 	mTitle = std::shared_ptr<Sprite>(new Sprite(mTitlePath));
 	mTitle->mSfSprite.setPosition(0.0f, 100.0f);
+
+	// Audio
+	mAudio = std::shared_ptr<Sprite>(new Sprite(mAudioPath));
+	mAudio->mSfSprite.setPosition(448.0f, 0.0f);
+	mAudioMute = std::shared_ptr<Sprite>(new Sprite(mAudioMutePath));
+	mAudioMute->mSfSprite.setPosition(448.0f, 0.0f);
 
 	// Fader
 	mFader = std::shared_ptr<Sprite>(new Sprite(mFadeTPath));
@@ -172,6 +182,24 @@ void Cat::Render(sf::RenderWindow* renderWindow)
 
 void Cat::UpdateMainMenu(float dt)
 {
+	auto r = Renderer::GetInstance();
+
+	// Mute
+	mAudioCurCd += dt;
+	sf::Vector2i mousePos = sf::Mouse::getPosition(*r->GetWindow());
+	if (mAudio->mSfSprite.getGlobalBounds().contains(mousePos.x,mousePos.y)&&
+		sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	{
+		if (mAudioCurCd >= mAudioCd)
+		{
+			mAudioCurCd = 0.0f;
+			mIsMuted = !mIsMuted;
+			if (mIsMuted)AudioManager::GetInstance()->SetVolume(0.0f);
+			else AudioManager::GetInstance()->SetVolume(10.0f);
+		}
+	}
+	
+	// Start btn
 	if (mStartBtn->IsPressed())
 	{
 		mHasStarted = true;
@@ -192,17 +220,43 @@ void Cat::UpdateIdle(float dt)
 	}
 
 	// Feed btn
+	mFedCurTimer += dt;
 	if (mFeedBtn->IsPressed())
 	{
-		mFedCurTimer += dt;
 		if (mFedCurTimer >= mFeedBtnCd)
 		{
+			mShowFeedBtns = !mShowFeedBtns;
 			mFedCurTimer = 0.0f;
+		}
+	}
+	// Snack btn
+	mSnackCurTimer += dt;
+	if (mSnackBtn->IsPressed())
+	{
+		if (mSnackCurTimer >= mSnackCd)
+		{
+			mSnackCurTimer = 0.0f;
+			printf("Snack\n");
 			// Reduce hunger
 			mStats.Hunger -= mSnackHunger;
 			mStats.Hunger = std::fmax(0.0f, mStats.Hunger);
 			// Increase weight
 			mStats.Weight += mSnackWeight;
+		}
+	}
+	// Meal btn
+	mMealCurTimer += dt;
+	if (mMealBtn->IsPressed())
+	{
+		if (mMealCurTimer >= mMealCd)
+		{
+			mMealCurTimer = 0.0f;
+			printf("MEAL\n");
+			// Reduce hunger
+			mStats.Hunger -= mMealHunger;
+			mStats.Hunger = std::fmax(0.0f, mStats.Hunger);
+			// Increase weight
+			mStats.Weight += mMealWeight;
 		}
 	}
 	// Pet btn
@@ -270,6 +324,22 @@ void Cat::UpdateSleeping(float dt)
 
 void Cat::UpdateStats(float dt)
 {
+	auto r = Renderer::GetInstance();
+
+	// Mute
+	mAudioCurCd += dt;
+	sf::Vector2i mousePos = sf::Mouse::getPosition(*r->GetWindow());
+	if (mAudio->mSfSprite.getGlobalBounds().contains(mousePos.x, mousePos.y) &&
+		sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	{
+		if (mAudioCurCd >= mAudioCd)
+		{
+			mAudioCurCd = 0.0f;
+			mIsMuted = !mIsMuted;
+			if (mIsMuted)AudioManager::GetInstance()->SetVolume(0.0f);
+			else AudioManager::GetInstance()->SetVolume(10.0f);
+		}
+	}
 	// Back to idle
 	if (mBackToIdleStatsBtn->IsPressed())
 	{
@@ -320,6 +390,14 @@ void Cat::RenderMainMenu(sf::RenderWindow * renderWindow)
 	auto r = Renderer::GetInstance();
 	r->Render(mStartBtn.get());
 	r->Render(mTitle.get());
+	if (mIsMuted)
+	{
+		r->Render(mAudioMute.get());
+	}
+	else
+	{
+		r->Render(mAudio.get());
+	}
 }
 
 void Cat::RenderIdle(sf::RenderWindow * renderWindow)
@@ -328,6 +406,11 @@ void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 
 	r->Render(mBackground.get());
 	r->Render(mFeedBtn.get());
+	if (mShowFeedBtns)
+	{
+		r->Render(mSnackBtn.get());
+		r->Render(mMealBtn.get());
+	}
 	r->Render(mPetBtn.get());
 	r->Render(mCleanBtn.get());
 	r->Render(mGoToStatsBtn.get());
@@ -425,6 +508,15 @@ void Cat::RenderStats(sf::RenderWindow * renderWindow)
 	renderWindow->draw(mHealthText);
 
 	r->Render(mBackToIdleStatsBtn.get());
+
+	if (mIsMuted)
+	{
+		r->Render(mAudioMute.get());
+	}
+	else
+	{
+		r->Render(mAudio.get());
+	}
 }
 
 void Cat::RenderFade(sf::RenderWindow * renderWindow)
@@ -464,4 +556,6 @@ void Cat::Reset()
 	mStats.Happiness = 0.5f;
 
 	mCurPoopTimer = 0.0f;
+
+	mShowFeedBtns = false;
 }

@@ -79,7 +79,7 @@ private:
 	float mHungerRatio = 0.01f;	// +0.01 each second
 	float mSnackWeight = 10.0f;	// + 10grames
 	float mSnackHunger = 0.25f;	// -0.25f hunger
-	float mMealWeight = 100.0f;	// + 100grames
+	float mMealWeight = 50.0f;	// + 100grames
 	float mMealHunger = 0.5f;	// - 0.5f hunger
 	float mPoopRatio = 0.05f;	// -0.05f each second
 	float mPoopCd = 10.0f;		// how often poop
@@ -92,6 +92,15 @@ private:
 	std::shared_ptr<Button> mStartBtn;
 	std::shared_ptr<Sprite> mTitle;
 	bool mHasStarted = false;
+
+	// Audio
+	const char* mAudioPath = "../data/textures/audio.png";
+	const char* mAudioMutePath = "../data/textures/audiomute.png";
+	bool mIsMuted = false;
+	std::shared_ptr<Sprite> mAudio;
+	std::shared_ptr<Sprite> mAudioMute;
+	float mAudioCd = 0.2f;
+	float mAudioCurCd = 0.2f;
 
 	// Poop
 	const char* mPoopPath = "../data/textures/poop.png";
@@ -120,8 +129,15 @@ private:
 	const char* mStdButton = "../data/textures/btntest.png";
 	const char* mStdButtonPressed = "../data/textures/btntestpres.png";
 	std::shared_ptr<Button> mFeedBtn;
-	float mFeedBtnCd = 1.5f;
-	float mFedCurTimer = 1.5f;
+	std::shared_ptr<Button> mSnackBtn;
+	std::shared_ptr<Button> mMealBtn;
+	float mFeedBtnCd = 0.15f;
+	float mFedCurTimer = 0.15f;
+	float mSnackCd = 0.25f;
+	float mSnackCurTimer = 0.25f;
+	float mMealCd = 0.25f;
+	float mMealCurTimer = 0.25f;
+	bool mShowFeedBtns = false;
 	// Stats
 	// Go to stats
 	std::shared_ptr<Button> mGoToStatsBtn;
