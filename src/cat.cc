@@ -8,6 +8,10 @@
 
 Cat::Cat()
 {
+	// Hacky hack so when we first fade in
+	// the scene dont pops (hearts and foods)
+	Reset();
+
 	// Initialize sounds and bg music
 	auto audioMan = AudioManager::GetInstance();
 	audioMan->AddTrack(mTrack1);
@@ -83,7 +87,7 @@ Cat::Cat()
 	mGoToStatsBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
 	mGoToStatsBtn->SetPosition(384.0f, 656.0f);
 	mBackToIdleStatsBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
-	mBackToIdleStatsBtn->SetPosition(128.0f, 550.0f);
+	mBackToIdleStatsBtn->SetPosition(384.0f, 656.0f);
 	// actions
 	mFeedBtn = std::shared_ptr<Button>(new Button(mStdButton,mStdButtonPressed));
 	mFeedBtn->SetPosition(0.0f, 656.0f);
@@ -95,6 +99,10 @@ Cat::Cat()
 	mPetBtn->SetPosition(128.0f, 656.0f);
 	mCleanBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
 	mCleanBtn->SetPosition(256.0f, 656.0f);
+
+	// Dead btn
+	mDeadBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
+	mDeadBtn->SetPosition(192.0f, 460.0f);
 
 	// Init cat
 	mCat = std::shared_ptr<Sprite>(new Sprite(mCatPath));
@@ -148,6 +156,9 @@ void Cat::Update(float dt)
 		break;
 	case kFade:
 		UpdateFade(dt);
+	case kDead:
+		UpdateDead(dt);
+		break;
 	default:
 		break;
 	}
@@ -174,6 +185,9 @@ void Cat::Render(sf::RenderWindow* renderWindow)
 		break;
 	case kFade:
 		RenderFade(renderWindow);
+		break;
+	case kDead:
+		RenderDead(renderWindow);
 		break;
 	default:
 		break;
@@ -213,6 +227,23 @@ void Cat::UpdateMainMenu(float dt)
 
 void Cat::UpdateIdle(float dt)
 {
+	// Acumulated play time (age)
+	mCurTime += dt;
+	mTimeDay += dt * mTimeMod;
+	if (mTimeDay > 1.0f)
+	{
+		mTimeDay = 0.0f;
+		mTotalDays++;
+	}
+	if (mTimeDay >= 0.5f && mTimeDay < 1.0f)
+	{
+		mNightTime = true;
+	}
+	else
+	{
+		mNightTime = false;
+	}
+
 	// Check debug
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F1))
 	{
@@ -236,7 +267,6 @@ void Cat::UpdateIdle(float dt)
 		if (mSnackCurTimer >= mSnackCd)
 		{
 			mSnackCurTimer = 0.0f;
-			printf("Snack\n");
 			// Reduce hunger
 			mStats.Hunger -= mSnackHunger;
 			mStats.Hunger = std::fmax(0.0f, mStats.Hunger);
@@ -251,7 +281,6 @@ void Cat::UpdateIdle(float dt)
 		if (mMealCurTimer >= mMealCd)
 		{
 			mMealCurTimer = 0.0f;
-			printf("MEAL\n");
 			// Reduce hunger
 			mStats.Hunger -= mMealHunger;
 			mStats.Hunger = std::fmax(0.0f, mStats.Hunger);
@@ -309,7 +338,9 @@ void Cat::UpdateIdle(float dt)
 	if (mStats.Health == 0.0f)
 	{
 		Reset();
-		mState = kMainMenu;
+		mState = kFade;
+		mFadeFrom = kIdle;
+		mFadeTo = kDead;
 		return;
 	}
 }
@@ -382,6 +413,17 @@ void Cat::UpdateFade(float dt)
 			mState = mFadeTo;
 			return;
 		}
+	}
+}
+
+void Cat::UpdateDead(float dt)
+{
+	if (mDeadBtn->IsPressed())
+	{
+		mState = kFade;
+		mFadeFrom = kDead;
+		mFadeTo = kMainMenu;
+		return;
 	}
 }
 
@@ -464,9 +506,18 @@ void Cat::RenderStats(sf::RenderWindow * renderWindow)
 {
 	auto r = Renderer::GetInstance();
 	
+	const float kTopOff = 50.0f;
+
+	//Title
+	mStatsTitle.setFont(mMainFont);
+	mStatsTitle.setPosition(5.0f, -32.0f + kTopOff);
+	mStatsTitle.setColor(sf::Color::Black);
+	mStatsTitle.setString("Stats");
+	renderWindow->draw(mStatsTitle);
+
 	// Age
 	mStatsAge.setFont(mMainFont);
-	mStatsAge.setPosition(5.0f, 0.0f);
+	mStatsAge.setPosition(15.0f, 0.0f + kTopOff);
 	mStatsAge.setColor(sf::Color::Black);
 	std::string age = "Age:" + std::to_string(mStats.Age);
 	mStatsAge.setString(age);
@@ -474,7 +525,7 @@ void Cat::RenderStats(sf::RenderWindow * renderWindow)
 
 	// Weight
 	mStatsWeight.setFont(mMainFont);
-	mStatsWeight.setPosition(5.0f, 64.0f);
+	mStatsWeight.setPosition(15.0f, 32.0f + kTopOff);
 	mStatsWeight.setColor(sf::Color::Black);
 	std::string wei = "Weight:" + std::to_string(mStats.Weight);
 	mStatsWeight.setString(wei);
@@ -482,7 +533,7 @@ void Cat::RenderStats(sf::RenderWindow * renderWindow)
 
 	// Hunger
 	mHungerText.setFont(mMainFont);
-	mHungerText.setPosition(5.0f, 128.0f);
+	mHungerText.setPosition(15.0f, 64.0f + kTopOff);
 	mHungerText.setColor(sf::Color::Black);
 	int hungerPer = (int)(mStats.Hunger * 100.0f);
 	std::string hun = "Hunger:" + std::to_string(hungerPer) + "%";
@@ -491,7 +542,7 @@ void Cat::RenderStats(sf::RenderWindow * renderWindow)
 
 	// Happiness
 	mHappinessText.setFont(mMainFont);
-	mHappinessText.setPosition(5.0f, 192.0f);
+	mHappinessText.setPosition(15.0f, 96.0f + kTopOff);
 	mHappinessText.setColor(sf::Color::Black);
 	int hapPer = (int)(mStats.Happiness * 100.0f);
 	std::string hap = "Happiness:" + std::to_string(hapPer) + "%";
@@ -500,12 +551,20 @@ void Cat::RenderStats(sf::RenderWindow * renderWindow)
 
 	// Health
 	mHealthText.setFont(mMainFont);
-	mHealthText.setPosition(5.0f, 256.0f);
+	mHealthText.setPosition(15.0f, 129.0f + kTopOff);
 	mHealthText.setColor(sf::Color::Black);
 	int heaPer = (int)(mStats.Health * 100.0f);
 	std::string hea = "Health:" + std::to_string(heaPer) + "%";
 	mHealthText.setString(hea);
 	renderWindow->draw(mHealthText);
+
+	// Total days
+	mTotalDaysText.setFont(mMainFont);
+	mTotalDaysText.setPosition(15.0f, 161.0f + kTopOff);
+	mTotalDaysText.setColor(sf::Color::Black);
+	std::string day = "Days:" + std::to_string(mTotalDays);
+	mTotalDaysText.setString(day);
+	renderWindow->draw(mTotalDaysText);
 
 	r->Render(mBackToIdleStatsBtn.get());
 
@@ -538,6 +597,9 @@ void Cat::RenderFade(sf::RenderWindow * renderWindow)
 	case kStats:
 		RenderStats(renderWindow);
 		break;
+	case kDead:
+		RenderDead(renderWindow);
+		break;
 	default:
 		break;
 	}
@@ -545,8 +607,18 @@ void Cat::RenderFade(sf::RenderWindow * renderWindow)
 	renderWindow->draw(mFader->mSfSprite);
 }
 
+void Cat::RenderDead(sf::RenderWindow * renderWindow)
+{
+	auto r = Renderer::GetInstance();
+	r->Render(mDeadBtn.get());
+}
+
 void Cat::Reset()
 {
+	// Food and heats
+	mCurHears = mHearts;
+	mCurFoods = mFoods;
+
 	// Set initial stats
 	mStats.Health = 1.0f;
 	mStats.Age = 0.0f;

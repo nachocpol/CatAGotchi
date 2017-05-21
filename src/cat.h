@@ -22,7 +22,8 @@ enum CatStates
 	kPlaying,
 	kSleeping,
 	kStats,
-	kFade
+	kFade,
+	kDead
 };
 
 class RenderWindow;
@@ -43,6 +44,7 @@ private:
 	void UpdateSleeping(float dt);
 	void UpdateStats(float dt);
 	void UpdateFade(float dt);
+	void UpdateDead(float dt);
 
 	void RenderMainMenu(sf::RenderWindow* renderWindow);
 	void RenderIdle(sf::RenderWindow* renderWindow);
@@ -50,7 +52,8 @@ private:
 	void RenderSleeping(sf::RenderWindow* renderWindow);
 	void RenderStats(sf::RenderWindow* renderWindow);
 	void RenderFade(sf::RenderWindow* renderWindow);
-
+	void RenderDead(sf::RenderWindow* renderWindow);
+	
 	void Reset();
 
 	CatStats mStats;
@@ -58,7 +61,7 @@ private:
 
 	// Fade
 	const char* mFadeTPath = "../data/textures/fadet.png";
-	float mFadeTime = 0.25f;
+	float mFadeTime = 0.20f;
 	float mFadeCurTime = 0.0f;
 	bool mHasFadedOut = false;
 	CatStates mFadeCurState;
@@ -96,11 +99,19 @@ private:
 	// Audio
 	const char* mAudioPath = "../data/textures/audio.png";
 	const char* mAudioMutePath = "../data/textures/audiomute.png";
-	bool mIsMuted = false;
+	bool mIsMuted = true;
 	std::shared_ptr<Sprite> mAudio;
 	std::shared_ptr<Sprite> mAudioMute;
 	float mAudioCd = 0.2f;
 	float mAudioCurCd = 0.2f;
+
+	// Time of day
+	float mCurTime = 0.0f;
+	float mTimeDay = 0.0f;
+	int mTotalDays = 0;
+	// 1.0f / mTimeMod = DayDuration seconds
+	float mTimeMod = 0.1f;
+	bool mNightTime = false;
 
 	// Poop
 	const char* mPoopPath = "../data/textures/poop.png";
@@ -149,11 +160,13 @@ private:
 	std::shared_ptr<Button> mCleanBtn;
 
 	// Stats text
+	sf::Text mStatsTitle;
 	sf::Text mStatsAge;
 	sf::Text mStatsWeight;
 	sf::Text mHungerText;
 	sf::Text mHappinessText;
 	sf::Text mHealthText;
+	sf::Text mTotalDaysText;
 
 	// Cat
 	const char* mCatPath = "../data/textures/cat.png";
@@ -162,6 +175,11 @@ private:
 	// Game bg
 	const char* mBgPath = "../data/textures/gamebg.jpg";
 	std::shared_ptr<Sprite> mBackground;
+
+	// Dead
+	const char* mDeadBtnPath = "../data/textures/btntest.png";
+	const char* mDeadBtnPressedPath = "../data/textures/btntestpres.png";
+	std::shared_ptr<Button> mDeadBtn;
 
 	// Debug
 	bool mShowDebug = false;
