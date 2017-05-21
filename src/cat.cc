@@ -244,18 +244,42 @@ void Cat::UpdateIdle(float dt)
 	// Select day time
 	if (mTimeDay >= 0.0f && mTimeDay < 0.25f)
 	{
+		if (mCurDayTime != kSunRise)
+		{
+			mBgTransition = true;
+			mTransitionFrom = mNight.get();
+			mTransitionTo = mSunrise.get();
+		}
 		mCurDayTime = kSunRise;
 	}
 	else if (mTimeDay >= 0.25f && mTimeDay < 0.50f)
 	{
+		if (mCurDayTime != kMidday)
+		{
+			mBgTransition = true;
+			mTransitionFrom = mSunrise.get();
+			mTransitionTo = mMidday.get();
+		}
 		mCurDayTime = kMidday;
 	}
 	else if (mTimeDay >= 0.5f && mTimeDay < 0.75f)
 	{
+		if (mCurDayTime != kSunset)
+		{
+			mBgTransition = true;
+			mTransitionFrom = mMidday.get();
+			mTransitionTo = mSunset.get();
+		}
 		mCurDayTime = kSunset;
 	}
 	else
 	{
+		if (mCurDayTime != kNight)
+		{
+			mBgTransition = true;
+			mTransitionFrom = mSunset.get();
+			mTransitionTo = mNight.get();
+		}
 		mCurDayTime = kNight;
 	}
 
@@ -478,6 +502,7 @@ void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 	default:
 		break;
 	}
+
 	//r->Render(mBackground.get());
 	r->Render(mFeedBtn.get());
 	if (mShowFeedBtns)

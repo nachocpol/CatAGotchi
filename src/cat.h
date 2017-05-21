@@ -128,6 +128,9 @@ private:
 	std::shared_ptr<Sprite> mMidday;
 	std::shared_ptr<Sprite> mSunset;
 	std::shared_ptr<Sprite> mNight;
+	bool mBgTransition = false;
+	Sprite* mTransitionFrom;
+	Sprite* mTransitionTo;
 
 	// Poop
 	const char* mPoopPath = "../data/textures/poop.png";
