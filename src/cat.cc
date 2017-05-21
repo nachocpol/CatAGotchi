@@ -1,3 +1,4 @@
+#include <chrono>
 #include <string>
 #include "SFML/Graphics.hpp"
 #include "cat.h"
@@ -105,25 +106,25 @@ Cat::Cat()
 	mStartBtn = std::shared_ptr<Button>(new Button(mStartBtnPath, mStartBtnPresPath));
 	mStartBtn->SetPosition(0.0f, 360.0f);
 	// menu
-	mGoToStatsBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
-	mGoToStatsBtn->SetPosition(384.0f, 656.0f);
-	mBackToIdleStatsBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
+	mGoToStatsBtn = std::shared_ptr<Button>(new Button(mGoToStatsPaht, mGoToStatsPresPaht));
+	mGoToStatsBtn->SetPosition(404.0f, 626.0f);
+	mBackToIdleStatsBtn = std::shared_ptr<Button>(new Button(mBackPath, mBackPath));
 	mBackToIdleStatsBtn->SetPosition(384.0f, 656.0f);
 	// actions
 	mFeedBtn = std::shared_ptr<Button>(new Button(mStdButton,mStdButtonPressed));
 	mFeedBtn->SetPosition(0.0f, 656.0f);
-	mSnackBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
-	mSnackBtn->SetPosition(0.0f, 592.0f);
+	mSnackBtn = std::shared_ptr<Button>(new Button(mCookiePath, mCookiePresPath));
+	mSnackBtn->SetPosition(-20.0f, 636.0f);
 	mMealBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
 	mMealBtn->SetPosition(0.0f, 528.0f);
 	mPetBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
 	mPetBtn->SetPosition(128.0f, 656.0f);
-	mCleanBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
-	mCleanBtn->SetPosition(256.0f, 656.0f);
+	mCleanBtn = std::shared_ptr<Button>(new Button(mCleanPath, mCleanPresPath));
+	mCleanBtn->SetPosition(176.0f, 636.0f);
 
 	// Dead btn
-	mDeadBtn = std::shared_ptr<Button>(new Button(mStdButton, mStdButtonPressed));
-	mDeadBtn->SetPosition(192.0f, 460.0f);
+	mDeadBtn = std::shared_ptr<Button>(new Button(mDeadBtnPath, mDeadBtnPressedPath));
+	mDeadBtn->SetPosition(0.0f, 260.0f);
 
 	// Poop
 	mPoopSprite = std::shared_ptr<Sprite>(new Sprite(mPoopPath));
@@ -136,9 +137,11 @@ Cat::Cat()
 
 	// Audio
 	mAudio = std::shared_ptr<Sprite>(new Sprite(mAudioPath));
-	mAudio->mSfSprite.setPosition(448.0f, 0.0f);
+	mAudio->mSfSprite.setPosition(5.0f, 658.0f);
+	mAudio->mSfSprite.setScale(0.85f, 0.85f);
 	mAudioMute = std::shared_ptr<Sprite>(new Sprite(mAudioMutePath));
-	mAudioMute->mSfSprite.setPosition(448.0f, 0.0f);
+	mAudioMute->mSfSprite.setPosition(5.0f, 658.0f);
+	mAudioMute->mSfSprite.setScale(0.85f, 0.85f);
 
 	// Fader
 	mFader = std::shared_ptr<Sprite>(new Sprite(mFadeTPath));
@@ -382,6 +385,7 @@ void Cat::UpdateIdle(float dt)
 #endif // _DEBUG
 
 	// Feed btn
+	/*
 	mFedCurTimer += dt;
 	if (mFeedBtn->IsPressed())
 	{
@@ -391,6 +395,7 @@ void Cat::UpdateIdle(float dt)
 			mFedCurTimer = 0.0f;
 		}
 	}
+	*/
 	// Snack btn
 	mSnackCurTimer += dt;
 	if (mSnackBtn->IsPressed())
@@ -406,6 +411,7 @@ void Cat::UpdateIdle(float dt)
 		}
 	}
 	// Meal btn
+	/*
 	mMealCurTimer += dt;
 	if (mMealBtn->IsPressed())
 	{
@@ -419,6 +425,8 @@ void Cat::UpdateIdle(float dt)
 			mStats.Weight += mMealWeight;
 		}
 	}
+	*/
+
 	// Pet btn
 	// Clean btn
 	if (mCleanBtn->IsPressed())
@@ -558,11 +566,16 @@ void Cat::UpdateDead(float dt)
 	}
 }
 
+static float sT = 0.0f;
 void Cat::RenderMainMenu(sf::RenderWindow * renderWindow)
-{
+{	
+	sT += 0.5f;
 	auto r = Renderer::GetInstance();
+	
 	r->Render(mMainBg.get());
 	r->Render(mStartBtn.get());
+	float s = sin(sT * 0.15f) * 10.0f;
+	mTitle.get()->mSfSprite.setPosition(0.0f,70.0f + s);
 	r->Render(mTitle.get());
 	if (mIsMuted)
 	{
@@ -617,13 +630,13 @@ void Cat::RenderIdle(sf::RenderWindow * renderWindow)
 		*/
 	}
 	//r->Render(mBackground.get());
-	r->Render(mFeedBtn.get());
-	if (mShowFeedBtns)
+	//r->Render(mFeedBtn.get());
+	//if (mShowFeedBtns)
 	{
 		r->Render(mSnackBtn.get());
-		r->Render(mMealBtn.get());
+		//r->Render(mMealBtn.get());
 	}
-	r->Render(mPetBtn.get());
+	//r->Render(mPetBtn.get());
 	r->Render(mCleanBtn.get());
 	r->Render(mGoToStatsBtn.get());
 

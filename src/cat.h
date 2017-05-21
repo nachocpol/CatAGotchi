@@ -82,7 +82,7 @@ private:
 	const char* mTrack2 = "../data/sounds/catsong_3.wav";
 
 	// Font
-	const char* mFontPath = "../data/fonts/arial.ttf";
+	const char* mFontPath = "../data/fonts/HoboStd.otf";
 	sf::Font mMainFont;
 
 	// Ratios and caps
@@ -92,8 +92,8 @@ private:
 	float mSnackHunger = 0.25f;	// -0.25f hunger
 	float mMealWeight = 50.0f;	// + 100grames
 	float mMealHunger = 0.5f;	// - 0.5f hunger
-	float mPoopRatio = 0.05f;	// -0.05f each second
-	float mPoopCd = 10.0f;		// how often poop
+	float mPoopRatio = 0.025f;	// -0.05f each second
+	float mPoopCd = 15.0f;		// how often poop
 	float mPoopStartSick = 10.0f; // after poopCd + sick reduce health
 	
 	// Main menu
@@ -111,7 +111,7 @@ private:
 	// Audio
 	const char* mAudioPath = "../data/textures/audio.png";
 	const char* mAudioMutePath = "../data/textures/audiomute.png";
-	bool mIsMuted = true;
+	bool mIsMuted = false;
 	std::shared_ptr<Sprite> mAudio;
 	std::shared_ptr<Sprite> mAudioMute;
 	float mAudioCd = 0.2f;
@@ -122,7 +122,7 @@ private:
 	float mTimeDay = 0.0f;
 	int mTotalDays = 0;
 	// 1.0f / mTimeMod = DayDuration seconds
-	float mTimeMod = 0.1f;
+	float mTimeMod = 0.02f;
 	CurDayTime mCurDayTime;
 	std::vector<const char*> mSunrisePath;
 	std::vector<const char*> mMiddayPath;
@@ -164,6 +164,8 @@ private:
 	// Feed
 	const char* mStdButton = "../data/textures/btntest.png";
 	const char* mStdButtonPressed = "../data/textures/btntestpres.png";
+	const char* mCookiePath = "../data/textures/cookie.png";
+	const char* mCookiePresPath = "../data/textures/cookiepres.png";
 	std::shared_ptr<Button> mFeedBtn;
 	std::shared_ptr<Button> mSnackBtn;
 	std::shared_ptr<Button> mMealBtn;
@@ -176,12 +178,18 @@ private:
 	bool mShowFeedBtns = false;
 	// Stats
 	// Go to stats
+	const char* mGoToStatsPaht = "../data/textures/settings.png";
+	const char* mGoToStatsPresPaht = "../data/textures/settingspres.png";
 	std::shared_ptr<Button> mGoToStatsBtn;
 	// Back to idle
+	const char* mBackPath = "../data/textures/back.png";
+	const char* mBackPathPressPath = "../data/textures/back.png";
 	std::shared_ptr<Button> mBackToIdleStatsBtn;
 	// Pet
 	std::shared_ptr<Button> mPetBtn;
 	// Clean
+	const char* mCleanPath = "../data/textures/clean.png";
+	const char* mCleanPresPath = "../data/textures/cleanpres.png";
 	std::shared_ptr<Button> mCleanBtn;
 
 	// Stats text
@@ -196,8 +204,8 @@ private:
 	sf::Text mTotalDaysText;
 
 	// Dead
-	const char* mDeadBtnPath = "../data/textures/btntest.png";
-	const char* mDeadBtnPressedPath = "../data/textures/btntestpres.png";
+	const char* mDeadBtnPath = "../data/textures/continue_small.png";
+	const char* mDeadBtnPressedPath = "../data/textures/continue.png";
 	std::shared_ptr<Button> mDeadBtn;
 
 	// Debug

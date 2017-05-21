@@ -22,6 +22,7 @@ bool Renderer::Init(unsigned int w, unsigned int h)
 	mVidMode.height = h;
 	mWindowStile = sf::Style::Close | sf::Style::Titlebar;
 	mWindow.create(mVidMode, "CatAGotchi", mWindowStile);
+	mWindow.setFramerateLimit(60);
 	return true;
 }
 
